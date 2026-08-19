@@ -32,7 +32,7 @@ The service will run every 15m.
 ### Detection
 
 It is meant to store user/password for the camera and information about where to save the snapshots.
-An example configuration file [can be found here](app/configuration.json).
+An example configuration file [can be found here](app/configuration_camera-front.json).
 
 ### MediaMTX
 
