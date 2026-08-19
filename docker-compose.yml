@@ -56,7 +56,7 @@ services:
       [
         "python3", "-m", "app.reolink_react_to_people",
         "--config", "app/configuration_camera-front.json",
-        "--ntfy-tag", "camera",
+        "--ntfy-tag", "camera-front",
         "--webhook-port", "8080",
         "--camera", "camera-front",
         ]
