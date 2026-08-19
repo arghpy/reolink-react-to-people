@@ -1,0 +1,42 @@
+def usage_description(description):
+    """Formatting for description"""
+    s = f"\n\nDESCRIPTION" f"\n\t{description}"
+    return s
+
+
+def usage_header(header):
+    """Formatting for header"""
+    s = f"\n\n{header.upper()}"
+    return s
+
+
+def add_option(option, description):
+    """Add formatted option in description"""
+    s = f"\n\n{option}," f"\n\t{description}"
+    return s
+
+
+def usage(argv):
+    """Print program usage"""
+    options = (
+        ("--help",              "print this help message",                                False),
+        ("--ntfy-tag TAG",      "TAG to which to send notification through ntfy",         True),
+        ("--config FILE",       "configuration FILE to use",                              True),
+        ("--camera CAMERA",     "CAMERA configured as path in mediaMTX",                  True),
+        ("--webhook-port PORT", "PORT to receive push notifications from Reolink camera", True),
+    )
+
+    str_options = " ".join(
+        [f"{opt[0]}" if opt[2] is True else f"[{opt[0]}]" for opt in options]
+    )
+    program_usage = f"{argv[0]} {str_options}"
+    program_description = usage_description("React to a push notification from a Reolink camera.")
+    program_options = "".join([add_option(opt[0], opt[1]) for opt in options])
+
+    program_help = (
+        program_usage,
+        program_description,
+        usage_header("options"),
+        program_options,
+    )
+    print("".join(program_help))
