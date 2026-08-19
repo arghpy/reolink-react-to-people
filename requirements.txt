@@ -1,0 +1,4 @@
+certifi
+numpy
+requests
+opencv-python-headless

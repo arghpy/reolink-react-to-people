@@ -1,0 +1,11 @@
+{
+  "rtsp": {
+    "feed": "<IP/FEED>",
+    "user": "<USER>",
+    "password": "<PASSWORD>",
+    "save_video": {
+      "path": "/path/to/recordings",
+      "name": "<video_name>"
+    }
+  }
+}
