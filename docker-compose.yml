@@ -4,6 +4,7 @@ services:
     dns:
       - <IP>
     image: bluenviron/mediamtx:1-ffmpeg
+    container_name: mediamtx
     restart: unless-stopped
     user: 1000:1000
     ports:
@@ -43,6 +44,7 @@ services:
     dns:
       - <IP>
     build: .
+    container_name: camera_front
     user: 1000:1000
     restart: unless-stopped
     ports:
