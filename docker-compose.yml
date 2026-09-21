@@ -22,7 +22,7 @@ services:
     command:
       - serve
     environment:
-      - TZ=<TZ>
+      - TZ=Europe/Bucharest
     volumes:
       - ntfy-cache:/var/cache/ntfy
       - ./ntfy:/etc/ntfy
