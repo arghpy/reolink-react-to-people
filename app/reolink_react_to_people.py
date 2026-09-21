@@ -2,21 +2,25 @@
 """React to a push notification from a Reolink camera"""
 import app.integrations.webhook
 import app.integrations.reolink
+import app.integrations.mediamtx
 from http.server import HTTPServer
 import app.utils.config
 import app.integrations.ntfy
 import app.utils.help
 import app.utils.logger
+import app.utils.files
 import cv2
 import os
 import queue
 import requests
+import json
 import signal
 import sys
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
 
 
 # Args
@@ -95,46 +99,63 @@ if __name__ == "__main__":
     webhook_reader_thread.start()
     app.utils.logger.iprint(f"Started listening on {ARGS['WEBHOOK_ARG']}")
 
-    reolink_token, reolink_token_expiration = app.integrations.reolink.login(ARGS["CAMERA_ARG"], app.utils.config.CONFIG["RTSP_USER"], app.utils.config.CONFIG["RTSP_PASS"])
+    reolink_token, reolink_token_expiration = app.integrations.reolink.login(ARGS["CAMERA_ARG"],
+                                                                             app.utils.config.CONFIG["RTSP_USER"],
+                                                                             app.utils.config.CONFIG["RTSP_PASS"])
     if not reolink_token:
         app.utils.logger.eprint(f"Could not login to Reolink camera: {ARGS['CAMERA_ARG']}")
         sys.exit(1)
 
     # Create directory structure
-    now = datetime.now()
+    now = datetime.now(ZoneInfo("Europe/Bucharest"))
     next_now = now + timedelta(hours=1)
 
     base_video_path = app.utils.config.CONFIG["VIDEO_PATH"]
-    output_video_path = (
+    now_video_path = (
         f"{base_video_path}"
         f"{now.strftime('/%Y/%m/%d/%H')}"
     )
-    next_output_video_path = (
+    next_video_path = (
         f"{base_video_path}"
         f"{next_now.strftime('/%Y/%m/%d/%H')}"
     )
 
-    SAVE_IMAGE_PATH = f"{output_video_path}/captures"
-    NEXT_SAVE_IMAGE_PATH = f"{next_output_video_path}/captures"
+    SAVE_IMAGE_PATH = f"{now_video_path}/captures"
+    NEXT_SAVE_IMAGE_PATH = f"{next_video_path}/captures"
     os.makedirs(SAVE_IMAGE_PATH, exist_ok=True)
     os.makedirs(NEXT_SAVE_IMAGE_PATH, exist_ok=True)
 
 
     # MAIN LOOP
     while True:
-        if datetime.now().hour == next_now.hour:
-            SAVE_IMAGE_PATH = NEXT_SAVE_IMAGE_PATH
+        if datetime.now(ZoneInfo("Europe/Bucharest")).hour == next_now.hour:
             # Create directory structure
-            now = datetime.now()
+            now = datetime.now(ZoneInfo("Europe/Bucharest"))
             next_now = now + timedelta(hours=1)
+            prev_now = now - timedelta(hours=1)
 
-            next_output_video_path = (
+            now_video_path = (
+                f"{base_video_path}"
+                f"{prev_now.strftime('/%Y/%m/%d/%H')}"
+            )
+            next_video_path = (
                 f"{base_video_path}"
                 f"{next_now.strftime('/%Y/%m/%d/%H')}"
             )
 
-            NEXT_SAVE_IMAGE_PATH = f"{next_output_video_path}/captures"
+            SAVE_IMAGE_PATH = f"{now_video_path}/captures"
+            NEXT_SAVE_IMAGE_PATH = f"{next_video_path}/captures"
             os.makedirs(NEXT_SAVE_IMAGE_PATH, exist_ok=True)
+
+            # A date object is immutable; all operations produce a new object
+            start = prev_now.replace(minute=0, second=0, microsecond=0).isoformat()
+            end = now.replace(minute=0, second=0, microsecond=0).isoformat()
+            download_hour_recording = threading.Thread(
+                target=app.integrations.mediamtx.download_recording,
+                args=(ARGS['CAMERA_ARG'], start, end, f"{now_video_path}/{ARGS['CAMERA_ARG']}.mp4"),
+                daemon=True,
+            )
+            download_hour_recording.start()
 
         if (reolink_token_expiration - time.time()) < 100:
             reolink_token, reolink_token_expiration = app.integrations.reolink.login(ARGS["CAMERA_ARG"], app.utils.config.CONFIG["RTSP_USER"], app.utils.config.CONFIG["RTSP_PASS"])
@@ -143,7 +164,7 @@ if __name__ == "__main__":
                 sys.exit(1)
 
         if app.integrations.webhook.camera_alert():
-            now = datetime.now()
+            now = datetime.now(ZoneInfo("Europe/Bucharest"))
             minute = now.minute
             second = now.second
 
