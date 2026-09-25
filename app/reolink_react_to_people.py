@@ -1,26 +1,21 @@
 #!/usr/bin/env python3
 """React to a push notification from a Reolink camera"""
+from http.server import HTTPServer
+import os
+import sys
+import threading
+import time
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+import requests
 import app.integrations.webhook
 import app.integrations.reolink
 import app.integrations.mediamtx
-from http.server import HTTPServer
 import app.utils.config
 import app.integrations.ntfy
 import app.utils.help
 import app.utils.logger
 import app.utils.files
-import cv2
-import os
-import queue
-import requests
-import json
-import signal
-import sys
-import threading
-import time
-from concurrent.futures import ThreadPoolExecutor
-from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo
 
 
 # Args

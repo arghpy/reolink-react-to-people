@@ -1,11 +1,8 @@
 import time
-import requests
-import threading
 import json
 import os
 import subprocess
-
-from datetime import datetime
+import requests
 import app.utils.logger
 
 
@@ -33,7 +30,8 @@ def download_recording(path: str, start: str, end: str, video_path: str) -> None
                                 "path": path,
                                 "start": start,
                                 "end": end,
-                            })
+                            },
+                            timeout=300)
     response.raise_for_status()
 
     recordings = response.json()

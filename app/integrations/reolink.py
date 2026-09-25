@@ -4,10 +4,9 @@ import string
 import urllib.request
 import urllib.parse
 import urllib.error
-import getpass
 import time
-import app.utils.logger
 from datetime import datetime
+import app.utils.logger
 
 
 def login(ip, username, password, timeout=5):
