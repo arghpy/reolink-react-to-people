@@ -1,7 +1,6 @@
-from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-import threading
-import app.utils.logger
+from http.server import BaseHTTPRequestHandler
 import json
+import app.utils.logger
 
 
 alert = False

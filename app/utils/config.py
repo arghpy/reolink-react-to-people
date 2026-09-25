@@ -27,4 +27,3 @@ def process_configuration(config_file):
         CONFIG["VIDEO_PATH"] = configuration["rtsp"]["save_video"]["path"]
     except KeyError:
         app.utils.logger.eprint("Video won't pe saved")
-

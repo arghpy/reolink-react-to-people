@@ -1,8 +1,8 @@
 import certifi
-import requests
-import app.utils.logger
 import cv2
 import numpy as np
+import requests
+import app.utils.logger
 
 
 def compress_for_ntfy(jpeg_bytes, quality=80):
@@ -28,6 +28,7 @@ def send_ntfy(base_url, tag, title, body, attachment_path, attachment_name):
         data = f.read()
     r = requests.post(
         url,
+        timeout=300,
         data=data,
         headers={
             "Filename": attachment_name,
